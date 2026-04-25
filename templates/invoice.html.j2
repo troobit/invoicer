@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>INVOICE — {{ data.invoice_number }}</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, sans-serif;
+      font-size: 11pt;
+      color: #1a1a1a;
+      padding: 40px;
+    }
+
+    /* Header band */
+    .header {
+      background: #2c3e50;
+      color: #fff;
+      padding: 24px 32px;
+      margin-bottom: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .header-logo {
+      height: 96px;
+      width: auto;
+    }
+
+    .header-title {
+      font-size: 22pt;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    /* Two-column blocks */
+    .blocks {
+      display: flex;
+      gap: 32px;
+      margin-bottom: 28px;
+    }
+
+    .block {
+      flex: 1;
+    }
+
+    .block h2 {
+      font-size: 9pt;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #666;
+      margin-bottom: 8px;
+      border-bottom: 1px solid #e0e0e0;
+      padding-bottom: 4px;
+    }
+
+    .block p {
+      margin-top: 3px;
+      line-height: 1.5;
+    }
+
+    /* Meta table */
+    .meta {
+      margin-bottom: 28px;
+    }
+
+    .meta table {
+      border-collapse: collapse;
+    }
+
+    .meta td {
+      padding: 4px 16px 4px 0;
+    }
+
+    .meta td:first-child {
+      font-weight: 600;
+      color: #444;
+      white-space: nowrap;
+    }
+
+    /* Line items table */
+    .items-section h2 {
+      font-size: 9pt;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #666;
+      margin-bottom: 8px;
+      border-bottom: 1px solid #e0e0e0;
+      padding-bottom: 4px;
+    }
+
+    table.items {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 24px;
+    }
+
+    table.items thead tr {
+      background: #2c3e50;
+      color: #fff;
+    }
+
+    table.items th {
+      padding: 8px 10px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 9.5pt;
+    }
+
+    table.items td {
+      padding: 7px 10px;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 10pt;
+    }
+
+    table.items tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    table.items th:not(:first-child):not(:nth-child(2)),
+    table.items td:not(:first-child):not(:nth-child(2)) {
+      text-align: right;
+    }
+
+    table.items {
+      border: 1px solid #d0d0d0;
+    }
+
+    /* Summary table */
+    .summary {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 28px;
+    }
+
+    table.summary-table {
+      border-collapse: collapse;
+      min-width: 300px;
+    }
+
+    table.summary-table td {
+      padding: 5px 12px;
+    }
+
+    table.summary-table td:last-child {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    table.summary-table tr.total {
+      background: #2c3e50;
+      color: #fff;
+      font-weight: 700;
+      font-size: 11pt;
+    }
+
+    table.summary-table {
+      border: 1px solid #d0d0d0;
+    }
+
+    /* Payment and late payment */
+    .section {
+      margin-bottom: 28px;
+    }
+
+    .section h2 {
+      font-size: 9pt;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #666;
+      margin-bottom: 8px;
+      border-bottom: 1px solid #e0e0e0;
+      padding-bottom: 4px;
+    }
+
+    .section p {
+      margin-top: 6px;
+      line-height: 1.6;
+    }
+
+    .section table {
+      border-collapse: collapse;
+      margin-top: 8px;
+    }
+
+    .section table td {
+      padding: 4px 16px 4px 0;
+    }
+
+    .section table td:first-child {
+      font-weight: 600;
+      color: #444;
+      white-space: nowrap;
+    }
+
+    @media print {
+      body {
+        padding: 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="header">
+    {% if logo_uri %}<img src="{{ logo_uri }}" alt="logo" class="header-logo">{% endif %}
+    <div class="header-title">INVOICE</div>
+  </div>
+
+  <div class="blocks">
+    <div class="block">
+      <h2>From</h2>
+      <p><strong>{{ config.entity_name }}</strong></p>
+      <p>ABN: {{ config.abn }}</p>
+      <p>{{ config.address }}</p>
+      <p>{{ config.email }}</p>
+      <p>{{ config.phone }}</p>
+    </div>
+    <div class="block">
+      <h2>Bill To</h2>
+      {% for name in data.client_name %}<p><strong>{{ name }}</strong></p>
+      {% endfor %}
+      {% if data.client_abn %}<p>ABN: {{ data.client_abn }}</p>{% endif %}
+      {% if data.client_identity %}<p>{{ data.client_identity }}</p>{% endif %}
+      {% if data.client_address %}<p>{{ data.client_address }}</p>{% endif %}
+    </div>
+    <div class="block">
+      <h2>Details</h2>
+      <table>
+        <tr>
+          <td>Number</td>
+          <td>{{ data.invoice_number }}</td>
+        </tr>
+        <tr>
+          <td>Issue Date</td>
+          <td>{{ data.issue_date }}</td>
+        </tr>
+        <tr>
+          <td>Due Date</td>
+          <td>{{ data.due_date }}</td>
+        </tr>
+        <tr>
+          <td>Terms</td>
+          <td>{{ config.payment_terms_days }} days</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="items-section">
+    <h2>Line Items</h2>
+    <table class="items">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Description</th>
+          <th>Type</th>
+          <th>Qty</th>
+          <th>Rate</th>
+          {% if config.tax_rate > 0 %}<th>Tax</th>{% endif %}
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in data.line_items %}
+        <tr>
+          <td>{{ item.date or '' }}</td>
+          <td>{{ item.description }}</td>
+          <td>{{ item.type }}</td>
+          <td>{{ item.quantity }}</td>
+          <td>{{ item.rate | aud }}</td>
+          {% if config.tax_rate > 0 %}<td>{{ item.tax | aud }}</td>{% endif %}
+          <td>{{ item.total | aud }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="summary">
+    <table class="summary-table">
+      {% if config.tax_rate > 0 %}
+      <tr>
+        <td>Subtotal (ex Tax)</td>
+        <td>{{ data.subtotal | aud }}</td>
+      </tr>
+      <tr>
+        <td>Total Tax</td>
+        <td>{{ data.total_tax | aud }}</td>
+      </tr>
+      {% else %}
+      <tr>
+        <td>Subtotal</td>
+        <td>{{ data.subtotal | aud }}</td>
+      </tr>
+      {% endif %}
+      <tr class="total">
+        <td>Total Payable</td>
+        <td>{{ data.total_payable | aud }}</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2>Payment Instructions</h2>
+    <table>
+      <tr>
+        <td>Account Name</td>
+        <td>{{ config.bank_name }}</td>
+      </tr>
+      <tr>
+        <td>BSB</td>
+        <td>{{ config.bsb }}</td>
+      </tr>
+      <tr>
+        <td>Account Number</td>
+        <td>{{ config.account_number }}</td>
+      </tr>
+      <tr>
+        <td>Reference</td>
+        <td>{{ data.invoice_number }}</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2>Late Payment Policy</h2>
+    <p>
+      Invoices remaining unpaid after the due date will be subject to a fixed late payment fee of
+      <strong>{{ config.late_payment_fee | aud }}</strong> per invoice, plus interest at the ATO General
+      Interest Charge (GIC) rate plus <strong>{{ config.late_payment_margin }}%</strong> per annum,
+      calculated and compounded daily from the due date until payment is received in full.
+    </p>
+  </div>
+
+</body>
+
+</html>

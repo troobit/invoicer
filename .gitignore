@@ -1,0 +1,14 @@
+**/.DS_Store
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+invoices/
+*.pdf
+*.md~
+defaults.yaml
+*.orbit**
+**/.orbit**
+invoice-**.yaml
+invoice_form.html
+

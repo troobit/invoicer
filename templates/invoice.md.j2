@@ -1,0 +1,87 @@
+# INVOICE
+
+---
+
+## Supplier
+
+**{{ config.entity_name }}**
+ABN: {{ config.abn }}
+{{ config.address }}
+{{ config.email }}
+{{ config.phone }}
+
+---
+
+## Bill To
+
+{% for name in data.client_name %}**{{ name }}**
+{% endfor %}
+{% if data.client_abn %}ABN: {{ data.client_abn }}{% endif %}
+{% if data.client_identity %}Identity: {{ data.client_identity }}{% endif %}
+{{ data.client_address }}
+
+---
+
+## Invoice Details
+
+| | |
+|---|---|
+| **Invoice Number** | {{ data.invoice_number }} |
+| **Issue Date** | {{ data.issue_date }} |
+| **Due Date** | {{ data.due_date }} |
+| **Payment Terms** | {{ config.payment_terms_days }} days |
+
+---
+
+## Line Items
+
+{% if config.tax_rate > 0 -%}
+| Date | Description | Type | Qty | Rate | Tax | Total |
+|------|-------------|------|-----|------|-----|-------|
+{% for item in data.line_items -%}
+| {{ item.date or '' }} | {{ item.description }} | {{ item.type }} | {{ item.quantity }} | {{ item.rate | aud }} | {{ item.tax | aud }} | {{ item.total | aud }} |
+{% endfor %}
+{%- else -%}
+| Date | Description | Type | Qty | Rate | Total |
+|------|-------------|------|-----|------|-------|
+{% for item in data.line_items -%}
+| {{ item.date or '' }} | {{ item.description }} | {{ item.type }} | {{ item.quantity }} | {{ item.rate | aud }} | {{ item.total | aud }} |
+{% endfor %}
+{%- endif %}
+
+---
+
+## Summary
+
+| | |
+|---|---|
+{% if config.tax_rate > 0 -%}
+| **Subtotal (ex Tax)** | {{ data.subtotal | aud }} |
+| **Total Tax** | {{ data.total_tax | aud }} |
+{% else -%}
+| **Subtotal** | {{ data.subtotal | aud }} |
+{% endif -%}
+| **Total Payable** | {{ data.total_payable | aud }} |
+
+---
+
+## Payment Instructions
+
+Please transfer the total payable to the following account:
+
+| | |
+|---|---|
+| **Account Name** | {{ config.bank_name }} |
+| **BSB** | {{ config.bsb }} |
+| **Account Number** | {{ config.account_number }} |
+| **Reference** | {{ data.invoice_number }} |
+
+---
+
+## Late Payment Policy
+
+Invoices remaining unpaid after the due date will be subject to:
+
+- A fixed late payment fee of **{{ config.late_payment_fee | aud }}** per invoice, and
+- Interest at the ATO General Interest Charge (GIC) rate plus **{{ config.late_payment_margin }}%** per annum,
+  calculated and compounded daily from the due date until payment is received in full.

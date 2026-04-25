@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Invoice</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, sans-serif;
+      font-size: 13px;
+      color: #1a1a1a;
+      background: #f5f5f5;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 40px auto;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, .1);
+      overflow: hidden;
+    }
+
+    .header {
+      background: #2c3e50;
+      color: #fff;
+      padding: 24px 32px;
+    }
+
+    .header h1 {
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .header p {
+      font-size: 12px;
+      color: #aec6cf;
+      margin-top: 4px;
+    }
+
+    .body {
+      padding: 32px;
+    }
+
+    h2 {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: #666;
+      border-bottom: 1px solid #e0e0e0;
+      padding-bottom: 6px;
+      margin: 24px 0 14px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #555;
+    }
+
+    input,
+    select {
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 7px 10px;
+      font-size: 13px;
+      width: 100%;
+    }
+
+    input:focus,
+    select:focus {
+      outline: none;
+      border-color: #2c3e50;
+    }
+
+    /* Line items */
+    #items-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 12px;
+    }
+
+    #items-table thead tr {
+      background: #2c3e50;
+      color: #fff;
+    }
+
+    #items-table th {
+      padding: 7px 8px;
+      font-size: 11px;
+      text-align: left;
+      font-weight: 600;
+    }
+
+    #items-table td {
+      padding: 5px 4px;
+      border-bottom: 1px solid #f0f0f0;
+      vertical-align: middle;
+    }
+
+    #items-table input,
+    #items-table select {
+      padding: 5px 7px;
+      font-size: 12px;
+    }
+
+    .remove-btn {
+      background: #c0392b;
+      color: #fff;
+      border: none;
+      border-radius: 3px;
+      padding: 4px 10px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    #add-item {
+      background: #27ae60;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 8px 16px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    /* Summary */
+    .summary {
+      display: flex;
+      justify-content: flex-end;
+      margin: 16px 0 8px;
+    }
+
+    .summary table {
+      border-collapse: collapse;
+      min-width: 280px;
+    }
+
+    .summary td {
+      padding: 5px 12px;
+      font-size: 13px;
+    }
+
+    .summary td:last-child {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .summary tr.total {
+      background: #2c3e50;
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .summary table {
+      border: 1px solid #d0d0d0;
+    }
+
+    .note {
+      font-size: 11px;
+      color: #888;
+      margin: 8px 0 20px;
+    }
+
+    /* Submit */
+    #submit-btn {
+      background: #2c3e50;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      padding: 12px 28px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+
+    #submit-btn:hover {
+      background: #1a252f;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Invoice</h1>
+      <p>Fill in the details. The YAML file saves to your Downloads folder. Then run: <br /> <code>python invoicer.py generated_yaml</code>.
+      </p>
+    </div>
+    <div class="body">
+      <form id="invoice-form" novalidate>
+
+        <h2>Details</h2>
+        <div class="grid">
+          <div class="field">
+            <label for="invoice_number">Number *</label>
+            <input type="text" id="invoice_number" placeholder="2024-001">
+          </div>
+          <div class="field"></div>
+          <div class="field">
+            <label for="issue_date">Issue Date *</label>
+            <input type="date" id="issue_date">
+          </div>
+          <div class="field">
+            <label for="due_date">Due Date *</label>
+            <input type="date" id="due_date">
+          </div>
+        </div>
+
+        <h2>Client Details</h2>
+        <div class="grid">
+          <div class="field">
+            <label for="client_name">Client Name *</label>
+            <input type="text" id="client_name" placeholder="ACME Pty Ltd">
+          </div>
+          <div class="field">
+            <label for="client_abn">Client ABN</label>
+            <input type="text" id="client_abn" placeholder="98 765 432 109">
+          </div>
+          <div class="field full">
+            <label for="client_address">Client Address</label>
+            <input type="text" id="client_address" placeholder="58 Manson Road, D4">
+          </div>
+        </div>
+
+        <h2>Line Items</h2>
+        <table id="items-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Description</th>
+              <th>Type</th>
+              <th>Qty</th>
+              <th>Rate (AUD)</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="items-body"></tbody>
+        </table>
+        <datalist id="type-suggestions">
+          <option value="hourly">
+          <option value="overtime">
+          <option value="white_glove">
+          <option value="on_call">
+          <option value="on_premise">
+          <option value="callout">
+          <option value="reimbursement">
+          <option value="disbursement">
+        </datalist>
+        <button type="button" id="add-item">+ Add Line Item</button>
+
+        <div class="summary">
+          <table>
+            <tr>
+              <td>Subtotal</td>
+              <td id="subtotal">$0.00</td>
+            </tr>
+            <tr class="total">
+              <td>Total</td>
+              <td id="total-payable">$0.00</td>
+            </tr>
+          </table>
+        </div>
+
+        <button type="submit" id="submit-btn">Download Invoice YAML</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Default rates baked in at generation time
+    const DEFAULT_RATES = {
+      {% for name, value in rates.items() %}{{ name }}: {{ value }},
+      {% endfor %}
+    };
+
+    const PAYMENT_TERMS_DAYS = {{ payment_terms_days }};
+
+    // Set date defaults and invoice number default
+    (function () {
+      const today = new Date();
+      const fmt = d => d.toISOString().slice(0, 10);
+      document.getElementById('issue_date').value = fmt(today);
+      const due = new Date(today);
+      due.setDate(due.getDate() + PAYMENT_TERMS_DAYS);
+      document.getElementById('due_date').value = fmt(due);
+      document.getElementById('issue_date').addEventListener('change', function () {
+        const base = new Date(this.value);
+        base.setDate(base.getDate() + PAYMENT_TERMS_DAYS);
+        document.getElementById('due_date').value = fmt(base);
+      });
+
+      // Default invoice number to yyyy-MM-001 based on the current date.
+      // To add a client-specific prefix, replace the template literal below with
+      //   e.g. `ACME-${yr}-${mo}-001`
+      // To use a dropdown of prefix options instead, swap this text input for a
+      //   <select id="invoice_prefix"> and build the value as:
+      //   `${document.getElementById('invoice_prefix').value}-${yr}-${mo}-001`
+      const yr = today.getFullYear();
+      const mo = String(today.getMonth() + 1).padStart(2, '0');
+      document.getElementById('invoice_number').value = `${yr}-${mo}-001`;
+    })();
+
+    let rowId = 0;
+
+    function addRow(type) {
+      type = type || 'hourly';
+      const rate = DEFAULT_RATES[type] || '';
+      const id = rowId++;
+      const tr = document.createElement('tr');
+      tr.dataset.id = id;
+      tr.innerHTML = `
+    <td><input type="date" class="item-date" data-id="${id}"></td>
+    <td><input type="text" class="item-desc" data-id="${id}" placeholder="Description" style="min-width:160px"></td>
+    <td><input type="text" class="item-type" data-id="${id}" value="${type}" list="type-suggestions" style="width:120px"></td>
+    <td><input type="number" class="item-qty" data-id="${id}" value="1" min="0.001" step="any" style="width:70px"></td>
+    <td><input type="number" class="item-rate" data-id="${id}" value="${rate}" min="0" step="any" style="width:100px"></td>
+    <td><button type="button" class="remove-btn" data-id="${id}">✕</button></td>
+  `;
+      document.getElementById('items-body').appendChild(tr);
+      tr.querySelector('.item-type').addEventListener('input', function () {
+        const defaultRate = DEFAULT_RATES[this.value];
+        if (defaultRate !== undefined) {
+          tr.querySelector('.item-rate').value = defaultRate;
+        }
+        updateTotals();
+      });
+      tr.querySelector('.remove-btn').addEventListener('click', function () {
+        tr.remove();
+        updateTotals();
+      });
+      tr.querySelectorAll('input').forEach(el => el.addEventListener('input', updateTotals));
+      updateTotals();
+    }
+
+    document.getElementById('add-item').addEventListener('click', () => addRow('hourly'));
+    addRow('hourly');
+
+    function fmtAud(n) {
+      return '$' + n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    }
+
+    function updateTotals() {
+      let subtotal = 0;
+      document.querySelectorAll('#items-body tr').forEach(tr => {
+        const qty = parseFloat(tr.querySelector('.item-qty')?.value) || 0;
+        const rate = parseFloat(tr.querySelector('.item-rate')?.value) || 0;
+        subtotal += Math.round(qty * rate * 100) / 100;
+      });
+      document.getElementById('subtotal').textContent = fmtAud(subtotal);
+      document.getElementById('total-payable').textContent = fmtAud(subtotal);
+    }
+
+    // YAML helpers — single-quote all string values, escape internal single quotes
+    function yStr(s) {
+      return "'" + String(s).replace(/'/g, "''") + "'";
+    }
+
+    document.getElementById('invoice-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      // Build YAML
+      const rows = [...document.querySelectorAll('#items-body tr')];
+      const lineItemsYaml = rows.map(tr => {
+        const date = tr.querySelector('.item-date')?.value;
+        const desc = tr.querySelector('.item-desc')?.value || '';
+        const type = tr.querySelector('.item-type')?.value || 'hourly';
+        const qty = tr.querySelector('.item-qty')?.value || '1';
+        const rate = tr.querySelector('.item-rate')?.value || '0';
+        const lines = [
+          `  - type: ${type}`,
+          `    description: ${yStr(desc)}`,
+        ];
+        if (date) lines.push(`    date: ${yStr(date)}`);
+        lines.push(`    quantity: ${qty}`);
+        lines.push(`    rate: ${rate}`);
+        return lines.join('\n');
+      }).join('\n');
+
+      const clientAbn = document.getElementById('client_abn').value.trim();
+      const yaml = [
+        `invoice_number: ${yStr(document.getElementById('invoice_number').value.trim())}`,
+        `issue_date: ${yStr(document.getElementById('issue_date').value)}`,
+        `due_date: ${yStr(document.getElementById('due_date').value)}`,
+        `client_name: ${yStr(document.getElementById('client_name').value.trim())}`,
+        `client_abn: ${clientAbn ? yStr(clientAbn) : 'null'}`,
+        `client_identity: null`,
+        `client_address: ${yStr(document.getElementById('client_address').value.trim())}`,
+        `output_path: null`,
+        ``,
+        `line_items:`,
+        lineItemsYaml,
+      ].join('\n');
+
+      const blob = new Blob([yaml], { type: 'text/yaml' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const invNum = document.getElementById('invoice_number').value.trim().replace(/[^a-zA-Z0-9-_]/g, '-');
+      a.href = url;
+      a.download = `invoice-${invNum}.yaml`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+  </script>
+</body>
+
+</html>

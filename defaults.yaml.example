@@ -1,0 +1,78 @@
+# defaults.yaml — supplier configuration for the invoicer tool.
+# Copy this file to defaults.yaml and fill in your details.
+# Run: cp defaults.yaml.example defaults.yaml
+
+# ── Supplier identity ─────────────────────────────────────────────────────────
+
+# Your legal trading name or company name as registered with ASIC.
+entity_name: "RTOB"
+
+# ABN
+abn: "12345678901"
+
+# Your business address as it should appear on the invoice.
+address: "Carlton, 3045"
+
+# Contact details shown in the supplier block.
+email: "invoices@rtob.com.au"
+phone: "+61123456789"
+
+# ── Banking details ───────────────────────────────────────────────────────────
+
+# Name on the bank account (usually matches entity_name).
+bank_name: "RTOB"
+
+# BSB in the format XXX-XXX.
+bsb: "012-123"
+
+# Bank account number.
+account_number: "12345678"
+
+# ── Invoice defaults ──────────────────────────────────────────────────────────
+
+# Days - due from the invoice issue date.
+payment_terms_days: 14
+
+# Directory where generated invoices (.md and .pdf) are written.
+# Can be overridden per invoice via output_path in the invoice YAML,
+# or via the --output-dir CLI flag.
+output_dir: "./invoices"
+
+# Path to your SVG logo file, embedded in the PDF header on every page.
+# Supports ~ for home directory.
+logo_path: "logo.png"
+
+# Tax rate applied to all line items. Set to 0.10 when GST-registered (10% Australian GST).
+tax_rate: 0.00
+
+# ── Late payment policy ───────────────────────────────────────────────────────
+
+# Fixed fee charged per overdue invoice (AUD).
+late_payment_fee: 150.00
+
+# Interest rate margin above the ATO General Interest Charge (GIC),
+# expressed as a percentage (e.g. 2.0 means GIC + 2%).
+late_payment_margin: 2.0
+
+# ── Default rates ─────────────────────────────────────────────────────────────
+# These are pre-populated in the HTML form and used when a line item does not
+# specify its own rate.
+
+rates:
+  # Standard hourly consulting rate (AUD per hour).
+  hourly: 220.00
+
+  # After-hours or overtime rate (AUD per hour).
+  overtime: 550.00
+
+  # White-glove / high-touch service rate (AUD per hour).
+  white_glove: 450.00
+
+  # On-call availability allowance (AUD per 24-hour period).
+  on_call: 250.00
+
+  # On-premise day rate (AUD per day).
+  on_premise: 1500.00
+
+  # Minimum callout charge (AUD per callout).
+  callout: 450.00
