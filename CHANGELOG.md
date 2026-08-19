@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+
+- `.vscode/launch.json`: VS Code debug configurations for running pytest tests (all tests, current file, with custom args, and via Test Explorer).
+- `templates/invoice.html.j2`: Added PayID payment instructions section (preferred payment method) in the payment instructions area.
+
 ### Changed
 
 - `lib/pdf_renderer.py`: Replaced WeasyPrint with Playwright/Chromium for PDF rendering. `render_pdf` now writes rendered HTML to a temp file, navigates headless Chromium to a `file://` URI, and calls `page.pdf(format="A4", print_background=True)`. Added type hints (`data: InvoiceData, config: Config`) and inline comments explaining the temp-file and print-background decisions. Module docstring updated.
